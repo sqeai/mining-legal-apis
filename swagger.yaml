@@ -1,0 +1,128 @@
+openapi: 3.0.3
+info:
+  title: Document Flow API
+  version: 1.0.0
+  description: API for managing document processing flows, including upload, OCR, approvals, and document generation.
+servers:
+  - url: https://api.example.com
+paths:
+  /flows:
+    get:
+      summary: Get list of document flows
+      parameters:
+        - name: type
+          in: query
+          schema:
+            type: string
+            enum: [NDA, PA, CONTRACT]
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [OPEN, DRAFT, REVIEW, REJECTED, APPROVED]
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: size
+          in: query
+          schema:
+            type: integer
+            default: 10
+        - name: search
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      content:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                            name:
+                              type: string
+                            category:
+                              type: string
+                            type:
+                              type: string
+                            storage_link:
+                              type: string
+                              format: uri
+                      totalData:
+                        type: integer
+                      totalPage:
+                        type: integer
+                      curentPage:
+                        type: integer
+                      nextPage:
+                        type: integer
+                  message:
+                    type: string
+      security:
+        - bearerAuth: []
+    post:
+      summary: Create a new flow
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                file_type:
+                  type: string
+                  enum: [docx, pdf]
+              required: [type, file_type]
+      responses:
+        '200':
+          description: Flow created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      type:
+                        type: string
+                      name:
+                        type: string
+                      document_id:
+                        type: string
+                      document_name:
+                        type: string
+                      document_type:
+                        type: string
+                      document_category:
+                        type: string
+                      upload_url:
+                        type: string
+                        format: uri
+                  message:
+                    type: string
+      security:
+        - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
